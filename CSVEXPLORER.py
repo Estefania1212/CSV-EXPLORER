@@ -4,18 +4,17 @@ import openpyxl
 
 def generate_questions(df):
     questions = []
+    num_columns = len(df.columns)
     for index, row in df.iterrows():
-        for column in range(len(row)):  # Iterate over all columns
+        for column in range(num_columns - 1):  # Iterate over all columns except the last one
             current_value = row.iloc[column]
-            if pd.notna(current_value):
-                next_column = column + 1
-                if next_column < len(row):
-                    next_value = row.iloc[next_column]
-                    if pd.notna(next_value):
-                        question = f"What is {current_value}?"
-                        answer = str(next_value)
-                        questions.append((index, column, question, answer))
+            next_value = row.iloc[column + 1]
+            if pd.notna(current_value) and pd.notna(next_value):
+                question = f"What is {current_value}?"
+                answer = str(next_value)
+                questions.append((index, column, question, answer))
     return questions
+
 
 
 def read_file(uploaded_file):
