@@ -47,7 +47,6 @@ def read_file(uploaded_file):
         return None
 
 
-
 def main():
     st.title("CSV/Excel FILE EXPLORER")
     
