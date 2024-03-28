@@ -25,6 +25,18 @@ def read_file(uploaded_file):
                 st.error("Unsupported file format")
                 return None
             
+            # Convert object columns to appropriate data types
+            for col in df.select_dtypes(include=['object']).columns:
+                try:
+                    df[col] = pd.to_numeric(df[col], errors='ignore')
+                except ValueError:
+                    pass  # If conversion fails, leave column as object type
+            
+            # Format percentage columns
+            for col in df.columns:
+                if df[col].dtype == 'float64' and df[col].min() >= 0 and df[col].max() <= 1:
+                    df[col] = df[col].map(lambda x: f"{x:.0%}")
+            
             return df.dropna(how='all')  # Filter out rows with all null values
         else:
             st.error("No file uploaded")
@@ -32,6 +44,7 @@ def read_file(uploaded_file):
     except Exception as e:
         st.error("Error reading file: " + str(e))  # Convert exception message to string
         return None
+
 
 
 
