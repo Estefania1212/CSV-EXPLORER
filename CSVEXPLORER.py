@@ -16,36 +16,29 @@ def generate_questions(df):
 
 def read_file(uploaded_file):
     try:
+        print("Uploaded file type:", type(uploaded_file))  # Print the type of uploaded_file
         if uploaded_file is not None:
             if uploaded_file.type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
-                # Load Excel file using openpyxl
-                wb = openpyxl.load_workbook(uploaded_file)
-                sheets = wb.sheetnames
-                sheet = wb[sheets[0]]  # Assuming only one sheet is present
-                
-                # Extract data from Excel sheet
-                data = sheet.values
-                cols = next(data)  # Get column headers
-                df = pd.DataFrame(data, columns=cols)
-                
-                # Convert object columns to appropriate data types
-                for col in df.select_dtypes(include=['object']).columns:
-                    try:
-                        df[col] = pd.to_numeric(df[col], errors='ignore')
-                    except ValueError:
-                        pass  # If conversion fails, leave column as object type
-                    
-                    # Format numeric columns as percentages if they contain values in the range (0, 1)
-                    if df[col].dtype == 'float64' and (df[col].min() >= 0) and (df[col].max() <= 1):
-                        df[col] = df[col].map(lambda x: f"{x:.0%}")
-                
-                return df.dropna(how='all')  # Filter out rows with all null values
+                df = pd.read_excel(uploaded_file, engine='openpyxl')
             elif uploaded_file.type == 'text/csv':
                 df = pd.read_csv(uploaded_file, encoding='latin-1')
-                return df.dropna(how='all')  # Filter out rows with all null values
             else:
                 st.error("Unsupported file format")
                 return None
+            
+            # Convert object columns to appropriate data types
+            for col in df.select_dtypes(include=['object']).columns:
+                try:
+                    df[col] = pd.to_numeric(df[col], errors='ignore')
+                except ValueError:
+                    pass  # If conversion fails, leave column as object type
+            
+            # Format percentage columns
+            for col in df.select_dtypes(include=['float']).columns:
+                if df[col].max() <= 1:  # Assume values less than or equal to 1 are percentages
+                    df[col] = df[col].map(lambda x: f"{x:.0%}")
+            
+            return df.dropna(how='all')  # Filter out rows with all null values
         else:
             st.error("No file uploaded")
             return None
