@@ -15,13 +15,20 @@ def generate_questions(df):
     return questions
 
 def read_file(file):
-    content = file.getvalue()
     try:
-        df = pd.read_csv(content)
+        if file.type == 'application/vnd.ms-excel':
+            data = io.BytesIO(file.read())
+            df = pd.read_excel(data)
+        elif file.type == 'text/csv':
+            df = pd.read_csv(file, encoding='latin-1')
+        else:
+            st.error("Unsupported file format")
+            return None
+        return df
     except Exception as e:
-        st.error("Error reading CSV file:", e)
+        st.error("Error reading file:", e)
         return None
-    return df
+
 
 def main():
     st.title("CSV/Excel FILE EXPLORER")
