@@ -13,7 +13,13 @@ def generate_questions(df):
                 question = f"What is {current_value}?"
                 answer = str(next_value)
                 questions.append((index, column, question, answer))
+        # Add a question for the last column if it has a value
+        if pd.notna(row.iloc[-1]):
+            question = f"What is {row.iloc[-1]}?"
+            answer = ""  # No answer provided for the last column
+            questions.append((index, num_columns - 1, question, answer))
     return questions
+
 
 
 
