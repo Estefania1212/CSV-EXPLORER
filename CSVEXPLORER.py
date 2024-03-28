@@ -12,7 +12,6 @@ def generate_questions(df):
                 answer = str(next_value)
                 questions.append((index, column, question, answer))
     return questions
-
 def read_file(uploaded_file):
     try:
         if uploaded_file is not None:
@@ -28,8 +27,9 @@ def read_file(uploaded_file):
             st.error("No file uploaded")
             return None
     except Exception as e:
-        st.error("Error reading file:", e)
+        st.error("Error reading file: " + str(e))  # Convert exception message to string
         return None
+
 
 def main():
     st.title("CSV/Excel FILE EXPLORER")
