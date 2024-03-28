@@ -13,7 +13,6 @@ def generate_questions(df):
                 answer = str(next_value)
                 questions.append((index, column, question, answer))
     return questions
-
 def read_file(uploaded_file):
     try:
         if uploaded_file is not None:
@@ -24,6 +23,19 @@ def read_file(uploaded_file):
             else:
                 st.error("Unsupported file format")
                 return None
+            
+            # Convert object columns to appropriate data types
+            for col in df.select_dtypes(include=['object']).columns:
+                try:
+                    df[col] = pd.to_numeric(df[col], errors='ignore')
+                except ValueError:
+                    pass  # If conversion fails, leave column as object type
+            
+            # Format percentage columns
+            for col in df.select_dtypes(include=['float']).columns:
+                if df[col].max() <= 1:  # Assume values less than or equal to 1 are percentages
+                    df[col] = df[col].map(lambda x: f"{x:.0%}")
+            
             return df.dropna(how='all')  # Filter out rows with all null values
         else:
             st.error("No file uploaded")
@@ -31,6 +43,7 @@ def read_file(uploaded_file):
     except Exception as e:
         st.error("Error reading file: " + str(e))  # Convert exception message to string
         return None
+
 
 def main():
     st.title("CSV/Excel FILE EXPLORER")
