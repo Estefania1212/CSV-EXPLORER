@@ -37,7 +37,7 @@ def read_file(uploaded_file):
             for col in df.select_dtypes(include=['float']).columns:
                 if df[col].max() <= 1:  # Assume values less than or equal to 1 are percentages
                     df[col] = df[col] * 100  # Convert decimal to percentage
-                    df[col] = df[col].map(lambda x: f"{x:.0f}%")  # Format as percentage string
+                    df[col] = df[col].apply(lambda x: f"{x:.0f}%")  # Format as percentage string
             
             # Handle other types of data interpretation here
             # For example, you could add logic to handle currency values, dates, etc.
@@ -49,6 +49,7 @@ def read_file(uploaded_file):
     except Exception as e:
         st.error("Error reading file: " + str(e))  # Convert exception message to string
         return None
+
 
 
 
