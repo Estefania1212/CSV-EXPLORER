@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 
@@ -17,7 +16,7 @@ def generate_questions(df):
 def read_file(uploaded_file):
     try:
         if uploaded_file is not None:
-            if uploaded_file.type == 'application/vnd.ms-excel':
+            if uploaded_file.type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
                 df = pd.read_excel(uploaded_file, engine='openpyxl')
             elif uploaded_file.type == 'text/csv':
                 df = pd.read_csv(uploaded_file, encoding='latin-1')
@@ -82,24 +81,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
